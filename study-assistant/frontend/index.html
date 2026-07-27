@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Study Assistant - Dashboard</title>
+    <meta name="description" content="AI-powered workspace offering interactive quizzes, PDF summarization, and an intelligent tutor chatbot powered by Gemini.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Marked for rendering markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div class="glass-bg"></div>
+    <div class="glow-dots"></div>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <h2>Study.AI</h2>
+            </div>
+            
+            <nav class="nav-menu">
+                <button class="nav-item active" data-tab="quiz-tab" id="btn-nav-quiz">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                    <span>Quiz Generator</span>
+                </button>
+                <button class="nav-item" data-tab="pdf-tab" id="btn-nav-pdf">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    <span>PDF Summarizer</span>
+                </button>
+                <button class="nav-item" data-tab="chat-tab" id="btn-nav-chat">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span>AI Chatbot</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="status-indicator">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Gemini 2.0 Flash Connected</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="content-header">
+                <div class="header-info">
+                    <h1 id="tab-title">Quiz Generator</h1>
+                    <p id="tab-desc">Challenge yourself and test your knowledge on any topic.</p>
+                </div>
+            </header>
+
+            <!-- Quiz Generator Tab -->
+            <section id="quiz-tab" class="tab-content active">
+                <div class="card glass-card">
+                    <div class="quiz-setup" id="quiz-setup">
+                        <h3>Create a New Quiz</h3>
+                        <p class="subtitle">Enter any topic, subject, or field of interest, and Gemini will generate a custom quiz for you.</p>
+                        
+                        <div class="form-group">
+                            <label for="quiz-topic">Quiz Topic</label>
+                            <input type="text" id="quiz-topic" placeholder="e.g., Quantum Mechanics, Ancient Roman History, Docker Fundamentals" required>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="quiz-count">Number of Questions</label>
+                                <select id="quiz-count">
+                                    <option value="3">3 Questions</option>
+                                    <option value="5" selected>5 Questions</option>
+                                    <option value="10">10 Questions</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button id="btn-generate-quiz" class="btn btn-primary">
+                            <span>Generate Quiz</span>
+                            <div class="btn-glow"></div>
+                        </button>
+                    </div>
+
+                    <div class="quiz-loading hidden" id="quiz-loading">
+                        <div class="spinner"></div>
+                        <p>Drafting questions using Gemini API...</p>
+                    </div>
+
+                    <!-- Interactive Quiz Play Area -->
+                    <div class="quiz-play hidden" id="quiz-play">
+                        <div class="quiz-progress-bar">
+                            <div class="progress-fill" id="quiz-progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="quiz-meta">
+                            <span id="quiz-question-number">Question 1 of 5</span>
+                            <span id="quiz-score">Score: 0</span>
+                        </div>
+                        
+                        <h2 class="quiz-question" id="quiz-question-text">Loading question...</h2>
+                        
+                        <div class="quiz-options" id="quiz-options-container">
+                            <!-- Dynamic options render here -->
+                        </div>
+
+                        <div class="quiz-action-bar">
+                            <button id="btn-next-question" class="btn btn-secondary hidden">Next Question</button>
+                            <button id="btn-finish-quiz" class="btn btn-primary hidden">Show Results</button>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Results -->
+                    <div class="quiz-results hidden" id="quiz-results">
+                        <div class="results-badge">
+                            <div class="score-circle">
+                                <span id="final-score-percent">80%</span>
+                            </div>
+                        </div>
+                        <h2 class="results-title">Quiz Completed!</h2>
+                        <p class="results-summary" id="final-score-text">You got 4 out of 5 questions correct.</p>
+                        
+                        <button id="btn-restart-quiz" class="btn btn-primary">Try Another Quiz</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PDF Summarizer Tab -->
+            <section id="pdf-tab" class="tab-content">
+                <div class="grid-2col">
+                    <div class="card glass-card">
+                        <h3>Upload Document</h3>
+                        <p class="subtitle">Upload a PDF study guide, research paper, or textbook chapter to generate a comprehensive summary.</p>
+                        
+                        <div class="upload-dropzone" id="pdf-dropzone">
+                            <input type="file" id="pdf-file-input" accept="application/pdf" class="hidden-input">
+                            <div class="dropzone-content">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                                <h4>Drag & Drop PDF here</h4>
+                                <p>or click to browse from files</p>
+                                <span class="file-limits">Maximum size: 10MB</span>
+                            </div>
+                            <div class="selected-file-info hidden" id="selected-file-info">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                <span id="file-name">document.pdf</span>
+                                <button type="button" class="btn-remove-file" id="btn-remove-file">&times;</button>
+                            </div>
+                        </div>
+
+                        <button id="btn-summarize" class="btn btn-primary btn-block" disabled>
+                            <span>Generate Summary</span>
+                            <div class="btn-glow"></div>
+                        </button>
+                    </div>
+
+                    <div class="card glass-card summary-result-card">
+                        <h3>Summary Results</h3>
+                        
+                        <div class="summary-placeholder" id="summary-placeholder">
+                            <p>Upload a PDF and click "Generate Summary" to view results here.</p>
+                        </div>
+                        
+                        <div class="summary-loading hidden" id="summary-loading">
+                            <div class="spinner"></div>
+                            <p>Reading PDF and extracting key takeaways using Gemini...</p>
+                        </div>
+
+                        <div class="summary-output markdown-body hidden" id="summary-output">
+                            <!-- Summary markdown will render here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Chatbot Tab -->
+            <section id="chat-tab" class="tab-content">
+                <div class="chat-container card glass-card">
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="message system-message">
+                            <div class="msg-bubble">
+                                Hello! I'm your AI Study Assistant powered by Gemini. Ask me any questions about your studies, summarize concepts, or request help explaining complex topics!
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input-area">
+                        <textarea id="chat-input" placeholder="Type a message or ask a study question..." rows="1"></textarea>
+                        <button id="btn-send-chat" class="btn btn-primary btn-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Script file -->
+    <script src="main.js"></script>
+</body>
+</html>
